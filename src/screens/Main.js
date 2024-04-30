@@ -23,27 +23,20 @@ import {
   registerPaletteElements,
 } from "react-page-maker";
 
-import { elements } from "./const";
-import DraggableTextbox from "./elements/DraggableTextbox";
-import DraggableLayoutR3C3 from "./elements/DraggableLayoutR3C3";
-import DraggableLayoutR1C2 from "./elements/DraggableLayoutR1C2";
-import DraggableDropdown from "./elements/DraggableDropdown";
-import DraggableSlider from "./elements/DraggableSlider";
-import DraggableHeader from "./elements/DraggableHeader";
-import DraggableImagePicker from "./elements/DraggableImagePicker";
-import DraggableVideoPicker from "./elements/DraggableVideo";
+import { elements } from "../const";
+import DraggableTextbox from "../elements/DraggableTextbox";
+import DraggableLayoutR3C3 from "../elements/DraggableLayoutR3C3";
+import DraggableLayoutR1C2 from "../elements/DraggableLayoutR1C2";
+import DraggableDropdown from "../elements/DraggableDropdown";
+import DraggableSlider from "../elements/DraggableSlider";
+import DraggableHeader from "../elements/DraggableHeader";
+import DraggableImagePicker from "../elements/DraggableImagePicker";
+import DraggableVideoPicker from "../elements/DraggableVideo";
 
 import "./App.css";
 import Preview from "./lib/Preview";
 
-import {
-  createBrowserRouter,
-  createRoutesFromElements,
-  Navigate,
-  Route,
-} from "react-router-dom";
-
-const App = () => {
+const Main = () => {
   // Register all palette elements
   registerPaletteElements([
     { type: elements.TEXTBOX, component: DraggableTextbox },
@@ -198,4 +191,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Main;
