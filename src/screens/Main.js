@@ -20,7 +20,7 @@ import {
   state,
   registerPaletteElements,
 } from "react-page-maker";
-
+import { useNavigate } from "react-router-dom";
 import { elements } from "../const";
 import DraggableTextbox from "../elements/DraggableTextbox";
 import DraggableLayoutR3C3 from "../elements/DraggableLayoutR3C3";
@@ -34,6 +34,7 @@ import DraggableVideoPicker from "../elements/DraggableVideo";
 import "../App.css";
 import Preview from "./Preview";
 const Main = () => {
+  const navigation = useNavigate();
   // Register all palette elements
   registerPaletteElements([
     { type: elements.TEXTBOX, component: DraggableTextbox },
@@ -49,11 +50,18 @@ const Main = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [currentState, setCurrentState] = useState([]);
 
-  console.log({ currentState });
+  useEffect(() => {
+    const access_token = window.localStorage.getItem("access_token");
+    console.log("Access token: " + access_token);
+    if (!access_token) {
+      console.log({ access_token });
+      navigation("login");
+    }
+  }, []);
   useEffect(() => {
     const handleStateChange = (s) => {
       const newState = state.getStorableState();
-      console.log({ newState });
+
       setCurrentState(newState);
       localStorage.setItem("initialElements", JSON.stringify(newState));
     };
@@ -168,6 +176,9 @@ const Main = () => {
       });
   };
 
+  const onHisory = () => {
+    navigation("/detail");
+  };
   return (
     <div className="d-flex flex-column vh-99 w-100 px-4">
       <Nav tabs className="justify-content-md-center">
@@ -220,6 +231,18 @@ const Main = () => {
                   }}
                 >
                   Submit
+                </Button>
+                <Button
+                  color="primary"
+                  className="flex px-4 rounded-4 "
+                  onClick={onHisory}
+                  style={{
+                    bottom: 10,
+                    right: 10,
+                    border: "2px solid red !important",
+                  }}
+                >
+                  history
                 </Button>
                 <Button
                   color="danger"

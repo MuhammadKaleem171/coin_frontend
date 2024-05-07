@@ -15,9 +15,11 @@ import {
   ToastHeader,
   Badge,
 } from "reactstrap";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api";
 
 const Login = () => {
+  const navigation = useNavigate();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [isLoggedin, setLoggedin] = React.useState(false);
@@ -37,6 +39,7 @@ const Login = () => {
       .then(async (response) => {
         console.log("RESPONSE from login success ", response.result.token);
         window.localStorage.setItem("access_token", response.result.token);
+        navigation("/home");
       })
       .catch((err) => {
         console.log("RESPONSE from login error ", err);
