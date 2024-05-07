@@ -15,7 +15,7 @@ class VideoPicker extends React.Component {
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
       this.setState({ videoUrl });
       // Notify parent component about the selected video URL
-      this.props.onSelect(videoUrl);
+      this.props.onSelect(videoUrl, file);
     }
   };
 
@@ -46,10 +46,10 @@ class VideoPicker extends React.Component {
 }
 
 class DraggableVideoPicker extends React.Component {
-  handleVideoSelect = (videoUrl) => {
+  handleVideoSelect = (videoUrl, file) => {
     const { id, dropzoneID, parentID } = this.props;
     state.updateElement(id, dropzoneID, parentID, {
-      payload: { videoUrl },
+      payload: { videoUrl, file },
     });
   };
 

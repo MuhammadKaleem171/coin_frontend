@@ -4,7 +4,7 @@ const renderElement = (element) => {
   switch (element.type) {
     case "TEXTBOX":
       return (
-        <div key={element.id}>
+        <div key={element.id} className="border py-2 px-2 mt-2 ">
           <label htmlFor={element.id}>{element.name}</label>
           {/* <input type="text" id={element.id} value={element.name} /> */}
         </div>

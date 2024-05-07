@@ -11,15 +11,13 @@ import {
   NavLink,
 } from "reactstrap";
 import ReactJson from "react-json-view";
-import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import axiosInstance from "../api";
+import "../../node_modules/bootstrap/dist/css/bootstrap.min.css";
 
 import {
   Canvas,
   Palette,
   state,
-  Trash,
-  core,
-  // Preview,
   registerPaletteElements,
 } from "react-page-maker";
 
@@ -33,9 +31,8 @@ import DraggableHeader from "../elements/DraggableHeader";
 import DraggableImagePicker from "../elements/DraggableImagePicker";
 import DraggableVideoPicker from "../elements/DraggableVideo";
 
-import "./App.css";
-import Preview from "./lib/Preview";
-
+import "../App.css";
+import Preview from "./Preview";
 const Main = () => {
   // Register all palette elements
   registerPaletteElements([
@@ -52,6 +49,7 @@ const Main = () => {
   const [activeTab, setActiveTab] = useState("1");
   const [currentState, setCurrentState] = useState([]);
 
+  console.log({ currentState });
   useEffect(() => {
     const handleStateChange = (s) => {
       const newState = state.getStorableState();
@@ -65,7 +63,6 @@ const Main = () => {
       state.removeEventListener("change", handleStateChange);
     };
   }, []);
-  console.log({ currentState });
   // Re-hydrate canvas state
   const initialElements = JSON.parse(localStorage.getItem("initialElements"));
 
@@ -80,8 +77,13 @@ const Main = () => {
     // { type: elements.DROPDOWN, name: "Dropdown Field", id: "f2" },
     // { type: elements.SLIDER, name: "Slider", id: "s1" },
     // { type: elements.HEADER, name: "Header", id: "h1" },
-    { type: elements.IMAGEPICKER, name: "ImagePicker", id: "image1" },
-    { type: elements.VIDEOPICKER, name: "Video Picker", id: "Video 1" },
+    { type: elements.IMAGEPICKER, name: "ImagePicker", id: "image1", file: {} },
+    {
+      type: elements.VIDEOPICKER,
+      name: "Video Picker",
+      id: "Video 1",
+      file: {},
+    },
     // {
     //   type: elements.GRID_LAYOUT_3_3,
     //   name: "3 by 3 Grid Layout",
@@ -93,9 +95,25 @@ const Main = () => {
     //   id: "1-2-grid",
     // },
   ];
+  function generateRandomId(length) {
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(
+        Math.floor(Math.random() * characters.length)
+      );
+    }
+
+    return result;
+  }
+
+  // Usage example
 
   const onDrop = (data, cb) => {
     // No need to ask id and name again
+    const uuid = generateRandomId(3);
     if (data.payload && data.payload.dropped) {
       return cb(data);
     }
@@ -103,10 +121,10 @@ const Main = () => {
     let name = data.name;
 
     if (data.type === elements.TEXTBOX || data.type === elements.DROPDOWN) {
-      name = window.prompt("Enter name of field");
+      name = uuid;
     }
 
-    const id = window.prompt("Please enter unique ID");
+    const id = uuid;
 
     cb({
       ...data,
@@ -126,6 +144,30 @@ const Main = () => {
     state.clearState();
   };
 
+  const onSubmit = async (ev) => {
+    ev.preventDefault();
+
+    const Text = currentState.find((input) => input.type === "TEXTBOX");
+    const Image = currentState.find((input) => input.type === "IMAGEPICKER");
+    const Video = currentState.find((input) => input.type === "VIDEOPICKER");
+
+    let data = new FormData();
+    data.append("video", Video?.payload?.file);
+
+    data.append("image", Image?.payload?.file);
+    data.append("text", Text.name);
+    data.append("data", JSON.stringify(currentState));
+
+    await axiosInstance
+      .post("userInfo", data)
+      .then(async (response) => {
+        console.log("RESPONSE from login success ", response);
+      })
+      .catch((err) => {
+        console.log("RESPONSE from login error ", err);
+      });
+  };
+
   return (
     <div className="d-flex flex-column vh-99 w-100 px-4">
       <Nav tabs className="justify-content-md-center">
@@ -134,7 +176,7 @@ const Main = () => {
             className={`${activeTab === "1" ? "active" : ""}`}
             onClick={() => toggleTab("1")}
           >
-            Canvas
+            Builder
           </NavLink>
         </NavItem>
         <NavItem>
@@ -145,31 +187,60 @@ const Main = () => {
             Preview
           </NavLink>
         </NavItem>
-        <NavItem>
+        {/* <NavItem>
           <NavLink
             className={`${activeTab === "3" ? "active" : ""}`}
             onClick={() => toggleTab("3")}
           >
             JSON
           </NavLink>
-        </NavItem>
+        </NavItem> */}
       </Nav>
       <TabContent activeTab={activeTab}>
         <TabPane tabId="1">
           <Row className="page-builder mt-3">
+            <Col
+              sm="3"
+              style={{
+                height: "90vh",
+                gap: 10,
+              }}
+            >
+              <Palette paletteElements={paletteItemsToBeRendered} />
+              {/* <Trash /> */}
+              <center>
+                <Button
+                  color="primary"
+                  className="flex px-4 rounded-4 "
+                  onClick={onSubmit}
+                  style={{
+                    bottom: 10,
+                    right: 10,
+                    border: "2px solid red !important",
+                  }}
+                >
+                  Submit
+                </Button>
+                <Button
+                  color="danger"
+                  className="flex px-4 rounded-4 "
+                  onClick={clearState}
+                  style={{
+                    bottom: 10,
+                    right: 10,
+                    border: "2px solid red !important",
+                  }}
+                >
+                  Reset
+                </Button>
+              </center>
+            </Col>
             <Col sm="9" className="canvas-container">
               <Canvas
                 onDrop={onDrop}
                 initialElements={initialElements}
                 placeholder="Drop Here"
               />
-            </Col>
-            <Col sm="3" style={{ height: "90vh", gap: 10 }}>
-              <Palette paletteElements={paletteItemsToBeRendered} />
-              {/* <Trash /> */}
-              <Button color="danger" className="mt-4" onClick={clearState}>
-                Flush Canvas
-              </Button>
             </Col>
           </Row>
         </TabPane>

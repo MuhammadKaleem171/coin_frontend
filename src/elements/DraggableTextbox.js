@@ -33,7 +33,7 @@ const DraggableTextbox = (props) => {
     <Draggable {...props}>
       <FormGroup className="m-0">
         <Label className="col-sm-12">
-          <span>{name}</span>
+          <span>{"Enter Text"}</span>
           <FaTrash
             className="pull-right"
             color="#dc3545"

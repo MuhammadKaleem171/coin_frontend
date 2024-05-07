@@ -15,7 +15,7 @@ class ImagePicker extends React.Component {
       const imageUrl = URL.createObjectURL(file);
       this.setState({ imageUrl });
       // Notify parent component about the selected image URL
-      this.props.onSelect(imageUrl);
+      this.props.onSelect(imageUrl, file);
     }
   };
 
@@ -62,11 +62,11 @@ class DraggableImagePicker extends React.Component {
     });
   };
 
-  handleImageSelect = (imageUrl) => {
+  handleImageSelect = (imageUrl, file) => {
     const { id, dropzoneID, parentID } = this.props;
     this.setState({ imageUrl }, () => {
       state.updateElement(id, dropzoneID, parentID, {
-        payload: { imageUrl },
+        payload: { imageUrl, file },
       });
     });
   };
